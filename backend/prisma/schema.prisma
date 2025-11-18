@@ -1,0 +1,93 @@
+// Prisma Schema for AI Companion
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions      Session[]
+  conversations Conversation[]
+  documents     Document[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@index([userId])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  role           String   // 'user' or 'assistant'
+  content        String   @db.Text
+  timestamp      DateTime @default(now())
+
+  // Optional fields for metadata
+  audioUrl       String?
+  emotion        String? // detected emotion from user input
+  avatarState    String? // avatar expression/gesture at this message
+  documentIds    String[] // related document IDs for context
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([timestamp])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  userId    String
+  filename  String
+  fileType  String // 'pdf', 'docx', 'txt'
+  fileSize  Int
+  filePath  String
+  extractedText String? @db.Text
+  uploadedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ConversationContext {
+  id             String   @id @default(uuid())
+  conversationId String   @unique
+  embedding      String?  @db.Text // JSON array of embeddings for RAG
+  summary        String?  @db.Text // Summary of conversation for context
+  updatedAt      DateTime @updatedAt
+
+  @@index([conversationId])
+}
