@@ -31,8 +31,8 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
       if (avatarUrl.trim()) {
         localStorage.setItem('avatar_url', avatarUrl)
       } else {
-        // Use default avatar
-        localStorage.setItem('avatar_url', 'https://models.readyplayer.me/64bfa15f0e72c63d7c3934a6.glb')
+        // Use default VRM avatar (anime style)
+        localStorage.setItem('avatar_url', 'https://pixiv.github.io/three-vrm/packages/three-vrm/examples/models/VRM1_Constraint_Twist_Sample.vrm')
       }
 
       onConfigured()
@@ -79,11 +79,21 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
               type="text"
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="Ready Player Me avatar URL"
+              placeholder="VRM or GLB avatar URL (.vrm for anime style)"
               className="config-input"
             />
             <small className="help-text">
-              Create a custom avatar at{' '}
+              <strong>Anime/VTuber style:</strong> Use{' '}
+              <a
+                href="https://vroid.com/en/studio"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                VRoid Studio
+              </a>{' '}
+              to create .vrm avatars
+              <br />
+              <strong>Realistic style:</strong> Use{' '}
               <a
                 href="https://readyplayer.me"
                 target="_blank"
@@ -91,7 +101,9 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
               >
                 Ready Player Me
               </a>{' '}
-              (Leave empty for default avatar)
+              for .glb avatars
+              <br />
+              (Leave empty for default VRM avatar)
             </small>
           </div>
 
@@ -105,13 +117,16 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
         <div className="features-list">
           <h3>Features:</h3>
           <ul>
-            <li>✨ Fully animated 3D avatar</li>
+            <li>✨ VTuber-style anime avatars (.vrm)</li>
             <li>🎤 Voice conversation support</li>
             <li>💭 Intelligent responses with emotion</li>
-            <li>🎭 Dynamic gestures and expressions</li>
+            <li>🎭 Facial expressions & gestures</li>
             <li>💕 Warm, caring personality</li>
             <li>🧠 Conversation memory</li>
           </ul>
+          <small style={{ marginTop: '12px', display: 'block', opacity: 0.8 }}>
+            📚 See AVATAR_GUIDE.md for creating custom characters
+          </small>
         </div>
       </div>
     </div>
