@@ -8,6 +8,8 @@ export interface Message {
   timestamp: number
   emotion?: 'happy' | 'sad' | 'excited' | 'thoughtful' | 'loving' | 'neutral'
   gesture?: 'wave' | 'nod' | 'shake' | 'jump' | 'dance' | 'think' | 'heart' | 'none'
+  gestureStyle?: 'calm' | 'normal' | 'excited' | 'thoughtful' | 'loving'
+  emotionIntensity?: number
 }
 
 interface ConversationState {
@@ -28,6 +30,57 @@ interface ConversationState {
   setGesture: (gesture: string) => void
   sendMessage: (content: string) => Promise<void>
   clearHistory: () => void
+}
+
+/**
+ * Analyze sentiment intensity from text
+ */
+function analyzeSentimentIntensity(text: string, emotion: string): number {
+  const lower = text.toLowerCase()
+  let intensity = 0.5 // Base intensity
+
+  // Exclamation marks increase intensity
+  const exclamations = (text.match(/!/g) || []).length
+  intensity += Math.min(exclamations * 0.15, 0.4)
+
+  // ALL CAPS words increase intensity
+  const capsWords = text.match(/\b[A-Z]{2,}\b/g) || []
+  intensity += Math.min(capsWords.length * 0.1, 0.3)
+
+  // Emotional keywords
+  const excitedWords = ['amazing', 'awesome', 'love', 'wonderful', 'fantastic', 'incredible', 'yay', 'woohoo']
+  const calmWords = ['gentle', 'soft', 'quiet', 'peaceful', 'calm', 'serene']
+
+  excitedWords.forEach(word => {
+    if (lower.includes(word)) intensity += 0.15
+  })
+
+  calmWords.forEach(word => {
+    if (lower.includes(word)) intensity -= 0.1
+  })
+
+  // Emotion-specific adjustments
+  if (emotion === 'excited') intensity += 0.2
+  if (emotion === 'sad') intensity -= 0.2
+  if (emotion === 'thoughtful') intensity -= 0.15
+
+  // Clamp between 0.3 and 1.5
+  return Math.max(0.3, Math.min(1.5, intensity))
+}
+
+/**
+ * Map emotion to gesture style
+ */
+function emotionToGestureStyle(emotion: string): 'calm' | 'normal' | 'excited' | 'thoughtful' | 'loving' {
+  const styleMap: { [key: string]: 'calm' | 'normal' | 'excited' | 'thoughtful' | 'loving' } = {
+    'happy': 'normal',
+    'sad': 'calm',
+    'excited': 'excited',
+    'thoughtful': 'thoughtful',
+    'loving': 'loving',
+    'neutral': 'normal'
+  }
+  return styleMap[emotion] || 'normal'
 }
 
 // Girlfriend personality system prompt
@@ -171,6 +224,10 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
         .replace(/\[GESTURE:\s*\w+\]/g, '')
         .trim()
 
+      // Analyze sentiment intensity and gesture style
+      const emotionIntensity = analyzeSentimentIntensity(cleanText, emotion)
+      const gestureStyle = emotionToGestureStyle(emotion)
+
       // Add assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -178,7 +235,9 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
         content: cleanText,
         timestamp: Date.now(),
         emotion,
-        gesture
+        gesture,
+        gestureStyle,
+        emotionIntensity
       }
       state.addMessage(assistantMessage)
 

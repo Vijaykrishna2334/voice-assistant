@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei'
-import EnhancedAvatar from './EnhancedAvatar'
+import AniLevelAvatar from './AniLevelAvatar'
 import './Scene.css'
 
 export default function Scene() {
@@ -26,8 +26,8 @@ export default function Scene() {
         {/* Environment */}
         <Environment preset="sunset" />
 
-        {/* Enhanced Avatar with VRM support */}
-        <EnhancedAvatar />
+        {/* Ani-Level Avatar - Always Alive! */}
+        <AniLevelAvatar />
 
         {/* Ground */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
