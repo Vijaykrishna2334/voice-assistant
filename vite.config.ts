@@ -5,6 +5,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: true
+    host: true,
+    cors: true,
+    headers: {
+      // Allow iframe embedding from any origin
+      'X-Frame-Options': 'ALLOWALL',
+      'Access-Control-Allow-Origin': '*'
+    }
   }
 })

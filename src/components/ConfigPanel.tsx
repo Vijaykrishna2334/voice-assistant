@@ -7,7 +7,8 @@ interface ConfigPanelProps {
 }
 
 export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
-  const [apiKey, setApiKey] = useState('')
+  const [apiKey, setApiKey] = useState(import.meta.env.VITE_GEMINI_API_KEY || '')
+  const [googleApiKey, setGoogleApiKey] = useState(localStorage.getItem('google_cloud_api_key') || '')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [error, setError] = useState('')
   const { initializeGemini } = useConversationStore()
@@ -24,15 +25,21 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
       // Initialize Gemini
       initializeGemini(apiKey)
 
-      // Store API key
+      // Store API keys
       localStorage.setItem('gemini_api_key', apiKey)
+
+      if (googleApiKey.trim()) {
+        localStorage.setItem('google_cloud_api_key', googleApiKey.trim())
+      } else {
+        localStorage.removeItem('google_cloud_api_key')
+      }
 
       // Store avatar URL if provided
       if (avatarUrl.trim()) {
         localStorage.setItem('avatar_url', avatarUrl)
       } else {
-        // Use default VRM avatar (anime style)
-        localStorage.setItem('avatar_url', 'https://pixiv.github.io/three-vrm/packages/three-vrm/examples/models/VRM1_Constraint_Twist_Sample.vrm')
+        // Use default Aria VRM avatar with custom poses
+        localStorage.setItem('avatar_url', '/Aria.vrm')
       }
 
       onConfigured()
@@ -51,7 +58,7 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
 
         <form onSubmit={handleSubmit} className="config-form">
           <div className="form-group">
-            <label htmlFor="apiKey">Gemini API Key *</label>
+            <label htmlFor="apiKey">Gemini API Key (Required)</label>
             <input
               id="apiKey"
               type="password"
@@ -61,49 +68,37 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
               className="config-input"
             />
             <small className="help-text">
-              Don't have a key?{' '}
-              <a
-                href="https://makersuite.google.com/app/apikey"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Get one free from Google AI Studio
-              </a>
+              Get your key from <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
             </small>
           </div>
 
           <div className="form-group">
-            <label htmlFor="avatarUrl">Avatar URL (Optional)</label>
+            <label htmlFor="googleApiKey">Google Cloud API Key (Optional)</label>
+            <input
+              id="googleApiKey"
+              type="password"
+              value={googleApiKey}
+              onChange={(e) => setGoogleApiKey(e.target.value)}
+              placeholder="Enter Google Cloud API Key for high-quality voice"
+              className="config-input"
+            />
+            <small className="help-text">
+              Enables high-quality Neural voices (Cloud Text-to-Speech API)
+            </small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="avatarUrl">Custom VRM URL (Optional)</label>
             <input
               id="avatarUrl"
               type="text"
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="VRM or GLB avatar URL (.vrm for anime style)"
+              placeholder="Enter URL for custom VRM model"
               className="config-input"
             />
             <small className="help-text">
-              <strong>Anime/VTuber style:</strong> Use{' '}
-              <a
-                href="https://vroid.com/en/studio"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                VRoid Studio
-              </a>{' '}
-              to create .vrm avatars
-              <br />
-              <strong>Realistic style:</strong> Use{' '}
-              <a
-                href="https://readyplayer.me"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Ready Player Me
-              </a>{' '}
-              for .glb avatars
-              <br />
-              (Leave empty for default VRM avatar)
+              Leave empty to use default Aria avatar
             </small>
           </div>
 
@@ -124,9 +119,6 @@ export default function ConfigPanel({ onConfigured }: ConfigPanelProps) {
             <li>💕 Warm, caring personality</li>
             <li>🧠 Conversation memory</li>
           </ul>
-          <small style={{ marginTop: '12px', display: 'block', opacity: 0.8 }}>
-            📚 See AVATAR_GUIDE.md for creating custom characters
-          </small>
         </div>
       </div>
     </div>

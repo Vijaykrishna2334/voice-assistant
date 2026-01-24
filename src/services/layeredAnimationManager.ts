@@ -255,14 +255,14 @@ class LayeredAnimationManager {
   /**
    * Get breathing value for current time
    */
-  getBreathingValue(time: number, frequency: number = 0.3, amplitude: number = 0.015): number {
+  getBreathingValue(time: number, frequency: number = 0.4, amplitude: number = 0.04): number {
     return Math.sin(time * frequency * Math.PI * 2) * amplitude
   }
 
   /**
    * Get sway value for current time
    */
-  getSwayValue(time: number, frequency: number = 0.2, amplitude: number = 0.02): number {
+  getSwayValue(time: number, frequency: number = 0.25, amplitude: number = 0.08): number {
     return Math.sin(time * frequency * Math.PI * 2) * amplitude
   }
 
@@ -274,13 +274,13 @@ class LayeredAnimationManager {
     const n1 = Math.sin(time * 0.7 + seed) * 0.5
     const n2 = Math.sin(time * 1.3 + seed * 2) * 0.3
     const n3 = Math.sin(time * 2.1 + seed * 3) * 0.2
-    return (n1 + n2 + n3) * 0.005
+    return (n1 + n2 + n3) * 0.02  // Increased from 0.005 to 0.02
   }
 
   /**
    * Check if should blink
    */
-  shouldBlink(time: number, lastBlinkTime: number, interval: number = 3.0): boolean {
+  shouldBlink(time: number, lastBlinkTime: number, interval: number = 2.5): boolean {
     const timeSinceLastBlink = time - lastBlinkTime
     // Add some randomness to blink interval
     const randomInterval = interval + (Math.random() - 0.5) * 1.0
