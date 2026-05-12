@@ -1,3 +1,7 @@
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=160&section=header&text=Aria%20-%20AI%20Voice%20Companion&fontSize=36&fontColor=fff&animation=twinkling&fontAlignY=36&desc=3D%20Animated%20AI%20Companion%20with%20Real-Time%20Voice&descAlignY=58&descSize=15" width="100%"/>
+</div>
+
 # 🌟 AI Virtual Companion - Aria
 
 A realistic AI companion with full 3D animations, voice interaction, and emotional intelligence powered by Google Gemini API.
